@@ -1,24 +1,38 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import createHistory from 'history/createBrowserHistory';
 import './App.css';
+import ListOfcontacts from './components/ListOfcontacts';
+import ContactDetails from './components/ContactDetails';
 
-function App() {
+function App(props) {
+  const [users, setUsers] = useState([]);
+  const history = createHistory({ forceRefresh: true });
+
+  const fetchUsers = async () => {
+    await fetch('https://randomuser.me/api/?results=100')
+      .then((res) => res.json())
+      .then((data) => setUsers(data.results));
+  };
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchUsers();
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router history={history}>
+        <Switch>
+          <Route exact path="/">
+            <ListOfcontacts users={users} />
+          </Route>
+          <Route exact path="/contactDetails">
+            <ContactDetails />
+          </Route>
+        </Switch>
+      </Router>
     </div>
   );
 }
